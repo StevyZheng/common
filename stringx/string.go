@@ -1,4 +1,4 @@
-package string
+package stringx
 
 import (
 	"fmt"
@@ -27,10 +27,10 @@ func Strip(srcStr string) string {
 
 //匹配字符串
 //regStr: reg字符串
-func MatchStr(srcStr string, regStr string) bool {
+func MatchStr(srcStr string, regStr string) (flag bool, err error) {
 	regStrTmp := fmt.Sprintf("(?m:%s)", regStr)
-	ok, _ := regexp.MatchString(regStrTmp, srcStr)
-	return ok
+	flag, err = regexp.MatchString(regStrTmp, srcStr)
+	return flag, err
 }
 
 //获取正则表达式所表示的字符串列表
@@ -51,6 +51,15 @@ func SearchSplitString(srcStr string, regStr string, splitStr string) [][]string
 	return ret
 }
 
+func SearchSplitStringColumn(srcStr string, regStr string, splitStr string, col int) []string {
+	tmp := SearchSplitString(srcStr, regStr, splitStr)
+	var ret []string
+	for _, v := range tmp {
+		ret = append(ret, Trim(v[col-1], " "))
+	}
+	return ret
+}
+
 //获取正则表达式所表示的第一个字符串
 func SearchStringFirst(srcStr string, regStr string) string {
 	regStr1 := fmt.Sprintf("(?m:%s)", regStr)
@@ -59,14 +68,14 @@ func SearchStringFirst(srcStr string, regStr string) string {
 	if findStr != nil {
 		return findStr[0]
 	} else {
-		return "nil"
+		return ""
 	}
 }
 
 //获取正则表达式所表示的字符串，并按splitStr分割后的二维列表的第一列
 func SearchSplitStringFirst(srcStr string, regStr string, splitStr string) []string {
 	re := SearchStringFirst(srcStr, regStr)
-	if re == "nil" {
+	if re == "" {
 		return nil
 	}
 	var ret []string
@@ -77,13 +86,13 @@ func SearchSplitStringFirst(srcStr string, regStr string, splitStr string) []str
 func SearchSplitStringColumnFirst(srcStr string, regStr string, splitStr string, col int) string {
 	tmp := SearchSplitStringFirst(srcStr, regStr, splitStr)
 	if tmp == nil {
-		return "nil"
+		return ""
 	}
 	return Trim(tmp[col-1], " ")
 }
 
 func UniqStringList(strList []string) []string {
-	newArr := make([]string, 0)
+	var newArr []string
 	sort.Strings(strList)
 	for i := 0; i < len(strList); i++ {
 		repeat := false
@@ -100,20 +109,20 @@ func UniqStringList(strList []string) []string {
 	return newArr
 }
 
-func StrToInt(src string) int {
-	tmp, err := strconv.Atoi(src)
+func StrToInt(src string) (ret int, err error) {
+	ret, err = strconv.Atoi(src)
 	if err != nil {
-		panic(err)
+		return -1, err
 	}
-	return tmp
+	return ret, err
 }
 
-func StrToInt64(src string) int64 {
-	tmp, err := strconv.ParseInt(src, 10, 64)
+func StrToInt64(src string) (ret int64, err error) {
+	ret, err = strconv.ParseInt(src, 10, 64)
 	if err != nil {
-		panic(err)
+		return -1, err
 	}
-	return tmp
+	return ret, err
 }
 
 func IntToStr(src int) string {
